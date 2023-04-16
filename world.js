@@ -1,9 +1,9 @@
-import { HittableList } from "./sphere.js";
-import vec3 from "./vec3.js";
+import { HittableList } from "./Sphere.js";
+import Point3D from "./Point3D.js";
 import { rayColor, averageColor } from "./controller.js";
 import { writeToImageData } from "./util.js";
 
-export default class world extends HittableList {
+export default class World extends HittableList {
     constructor() {
         super();
     }
@@ -19,7 +19,7 @@ export default class world extends HittableList {
         for (let y = img.imgHeight - 1; y >= 0; y--) {
             //console.log("Scanning row " + y);
             for (let x = img.imgWidth; x >= 0; x--) {
-                let pixelColor = new vec3(0, 0.5, 0);
+                let pixelColor = new Point3D(0, 0.5, 0);
 
                 // Cast samplesPerPixel rays for each pixel
                 for (let s = 0; s < img.samplesPerPixel; s++) {

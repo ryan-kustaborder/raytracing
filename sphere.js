@@ -1,11 +1,11 @@
-import vec3 from "./vec3.js";
+import Point3D from "./Point3D.js";
 import { dot } from "./util.js";
-import material from "./materials.js";
+import LambertianMaterial from "./Materials.js";
 
 // Generic class for all hittable objects
 class Hittable {
     constructor() {
-        this.material = new material();
+        this.material = new LambertianMaterial();
     }
     hit(r, tMin, tMax, rec) {
         return;
@@ -33,7 +33,7 @@ export class HittableList extends Hittable {
         super();
 
         this.hittables = [];
-        this.material = new material();
+        this.material = new LambertianMaterial();
     }
 
     add(e) {
@@ -66,7 +66,7 @@ export class HittableList extends Hittable {
 }
 
 // Represents a simple sphere
-export default class sphere extends Hittable {
+export default class Sphere extends Hittable {
     constructor(center, radius, material) {
         super();
 

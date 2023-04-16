@@ -1,4 +1,4 @@
-import vec3 from "./vec3.js";
+import Point3D from "./Point3D.js";
 
 export function map(val, fromMin, fromMax, toMin, toMax) {
     return ((val - fromMin) / (fromMax - fromMin)) * (toMax - toMin) + toMin;
@@ -35,7 +35,7 @@ export function clamp(val, min, max) {
 }
 
 export function randomDirection() {
-    return new vec3(
+    return new Point3D(
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
         Math.random() * 2 - 1

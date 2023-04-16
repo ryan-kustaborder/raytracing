@@ -6,15 +6,15 @@ import {
     dot,
     randomDirectionInUnitSphere,
 } from "./util.js";
-import vec3 from "./vec3.js";
-import ray from "./ray.js";
+import Point3D from "./Point3D.js";
+import Ray from "./Ray.js";
 
-export default class material {
+export default class LambertianMaterial {
     constructor(color) {
         if (color != null) {
             this.materialColor = color;
         } else {
-            this.materialColor = new vec3(
+            this.materialColor = new Point3D(
                 Math.random(),
                 Math.random(),
                 Math.random()
@@ -22,29 +22,29 @@ export default class material {
         }
 
         // These currently do nothing, but are placeholders for future light implementation
-        this.emissionColor = new vec3(0.2, 0.5, 0);
+        this.emissionColor = new Point3D(0.2, 0.5, 0);
         this.emissionStrength = Math.random();
     }
 
     // Gets the light that is added from interacting with the material
     scatter(rIn, rec) {
         // Pick a random direction
-        let scatter_direction = rec.normal.addVector(randomUnitVector());
+        let scatterDirection = rec.normal.addVector(randomUnitVector());
 
         // If it is close to 0, we can save computation by just using the normal
-        if (isNearZero(scatter_direction)) {
-            scatter_direction = rec.normal;
+        if (isNearZero(scatterDirection)) {
+            scatterDirection = rec.normal;
         }
 
         return {
             didScatter: true,
-            scattered: new ray(rec.point, scatter_direction), // Ray from hit point in direction of scatter
+            scattered: new Ray(rec.point, scatterDirection), // Ray from hit point in direction of scatter
             attenuation: rec.material.materialColor, // Add the material's color to the ray
         };
     }
 }
 
-export class metal extends material {
+export class ReflectiveLambertianMaterial extends LambertianMaterial {
     constructor(color, roughness) {
         super(color);
 
@@ -61,7 +61,7 @@ export class metal extends material {
         let reflected = reflect(unitVector(rIn.direction), rec.normal);
 
         // Find path of scattered ray
-        let scattered = new ray(
+        let scattered = new Ray(
             rec.point,
             reflected.addVector(
                 randomDirectionInUnitSphere().scale(this.roughness) // Roughness adds random perturbations, producing "fuzzier" reflections

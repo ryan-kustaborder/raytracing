@@ -1,4 +1,4 @@
-export default class image {
+export default class Image {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
