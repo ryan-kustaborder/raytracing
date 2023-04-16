@@ -55,6 +55,7 @@ export function rayColor(r, world, depth) {
         let emittedLight = resRec.material.emissionColor.scale(
             resRec.material.emissionStrength
         );
+        nextColor = nextColor.multiplyVector(resRec.material.materialColor);
         nextColor = nextColor.scale(resRec.material.diffuseStrength);
 
         // Return the ray color

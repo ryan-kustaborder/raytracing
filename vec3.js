@@ -27,6 +27,10 @@ export default class vec3 {
         return new vec3(this.x() - v.x(), this.y() - v.y(), this.z() - v.z());
     }
 
+    multiplyVector(v) {
+        return new vec3(this.x() * v.x(), this.y() * v.y(), this.z() * v.z());
+    }
+
     scale(s) {
         return new vec3(this.x() * s, this.y() * s, this.z() * s);
     }
