@@ -67,11 +67,13 @@ export class HittableList extends Hittable {
 
 // Represents a simple sphere
 export default class sphere extends Hittable {
-    constructor(center, radius) {
+    constructor(center, radius, material) {
         super();
 
         this.center = center;
         this.radius = radius;
+
+        this.material = material;
     }
 
     hit(r, tMin, tMax, rec) {

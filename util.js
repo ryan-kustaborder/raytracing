@@ -55,3 +55,13 @@ export function randomDirectionInUnitSphere() {
 export function randomUnitVector() {
     return unitVector(randomDirectionInUnitSphere());
 }
+
+export function isNearZero(v) {
+    // Return true if the vector is close to zero in all dimensions.
+    const s = 0.00000001;
+    return Math.abs(v.x()) < s && Math.abs(v.y()) < s && Math.abs(v.z()) < s;
+}
+
+export function reflect(v, n) {
+    return v.subtractVector(n.scale(dot(v, n)).scale(2));
+}

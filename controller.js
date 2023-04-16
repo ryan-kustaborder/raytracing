@@ -37,29 +37,14 @@ export function rayColor(r, world, depth) {
     if (result.hit) {
         let resRec = result.record;
 
-        // Generate random direction from hit point
-        let target = resRec.point
-            .addVector(resRec.normal)
-            .addVector(randomUnitVector());
-
-        // Create a new ray from hit point
-        let newRay = new ray(
-            result.record.point,
-            target.subtractVector(resRec.point)
-        );
-
-        // Get the color from the new ray
-        let nextColor = rayColor(newRay, world, depth - 1);
-
-        // Add color from this hit
-        let emittedLight = resRec.material.emissionColor.scale(
-            resRec.material.emissionStrength
-        );
-        nextColor = nextColor.multiplyVector(resRec.material.materialColor);
-        nextColor = nextColor.scale(resRec.material.diffuseStrength);
-
-        // Return the ray color
-        return nextColor;
+        let scatterResponse = resRec.material.scatter(r, resRec);
+        if (scatterResponse.didScatter) {
+            return scatterResponse.attenuation.multiplyVector(
+                rayColor(scatterResponse.scattered, world, depth - 1)
+            );
+        } else {
+            return new vec3(0, 0, 0);
+        }
     }
 
     // If no hit, color is based on background gradient
