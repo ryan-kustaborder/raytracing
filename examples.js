@@ -27,6 +27,39 @@ function singleSphere() {
     img.ctx.putImageData(imgData, 0, 0);
 }
 
+function createWorker(config) {
+    let worker = new Worker("./workers/worker.js");
+
+    worker.onmessage = function (msg) {
+        const ctx = document.getElementById("canvas").getContext("2d");
+        const imageData = ctx.createImageData(
+            config.bounds.width,
+            config.bounds.height
+        );
+        const inputArray = msg.data;
+
+        //Put data into ImageData object
+        for (let i = 0; i < inputArray.length; i += 4) {
+            const r = inputArray[i];
+            const g = inputArray[i + 1];
+            const b = inputArray[i + 2];
+            const a = inputArray[i + 3];
+
+            imageData.data[i] = r;
+            imageData.data[i + 1] = g;
+            imageData.data[i + 2] = b;
+            imageData.data[i + 3] = a;
+        }
+
+        // Draw the image to the canvas
+        ctx.putImageData(imageData, config.bounds.x0, config.bounds.y0);
+
+        console.log("Worker Finished");
+    };
+
+    return worker;
+}
+
 function metallicSpheres() {
     // Camera
     const camera = new Camera();
@@ -50,43 +83,29 @@ function metallicSpheres() {
     wor.add(new Sphere(new Point3D(-1.0, 0.0, -1.0), 0.5, material_left));
     wor.add(new Sphere(new Point3D(1.0, 0.0, -1.0), 0.5, material_right));
 
-    // Set up worker
-    const width = 200;
-    const height = 225;
-    const x0 = 50;
-    const y0 = 0;
+    const sectionSize = 100;
+    console.log(img);
+    for (let x = 0; x * sectionSize < img.imgWidth; x++) {
+        for (let y = 0; y * sectionSize < img.imgHeight; y++) {
+            // Set up worker
+            let config = {
+                world: wor,
+                camera: camera,
+                image: img,
+                bounds: {
+                    x0: sectionSize * x,
+                    y0: sectionSize * y,
+                    width: sectionSize,
+                    height: sectionSize,
+                },
+            };
 
-    let worker = new Worker("./workers/worker.js");
-    let config = {
-        world: wor,
-        camera: camera,
-        image: img,
-        bounds: { x0: x0, y0: y0, width: width, height: height },
-    };
+            let worker = createWorker(config);
 
-    worker.onmessage = function (msg) {
-        const imageData = img.ctx.createImageData(width, height);
-        const inputArray = msg.data;
-
-        //Put data into ImageData object
-        for (let i = 0; i < inputArray.length; i += 4) {
-            const r = inputArray[i];
-            const g = inputArray[i + 1];
-            const b = inputArray[i + 2];
-            const a = inputArray[i + 3];
-
-            imageData.data[i] = r;
-            imageData.data[i + 1] = g;
-            imageData.data[i + 2] = b;
-            imageData.data[i + 3] = a;
+            // Actually start the worker
+            worker.postMessage(JSON.parse(JSON.stringify(config)));
         }
-        console.log(imageData);
-        // Draw the image to the canvas
-        img.ctx.putImageData(imageData, x0, y0);
-    };
-
-    // Actually start the worker
-    worker.postMessage(JSON.parse(JSON.stringify(config)));
+    }
 }
 
 function manySpheresWorld() {
