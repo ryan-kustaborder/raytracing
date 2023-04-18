@@ -186,9 +186,8 @@ class World extends HittableList {
 
         let i = 0;
 
-        for (let y = y0; y < h; y++) {
-            //console.log("Scanning row " + y);
-            for (let x = x0; x < w; x++) {
+        for (let y = h; y > x0; y--) {
+            for (let x = w; x > y0; x--) {
                 let pixelColor = new Point3D(0, 0.5, 0);
                 // Cast samplesPerPixel rays for each pixel
                 for (let s = 0; s < img.samplesPerPixel; s++) {
@@ -200,11 +199,10 @@ class World extends HittableList {
                     // Add to cumulative color for this pixel
                     pixelColor = pixelColor.addVector(colorFromRay);
                 }
-                // Write the final pixel to the image
-                //console.log(pixelColor.x());
 
+                // Write the final pixel
                 let color = averageColor(pixelColor, samplesPerPixel);
-                console.log(i);
+
                 imgData[i + 0] = map255(color.x());
                 imgData[i + 1] = map255(color.y());
                 imgData[i + 2] = map255(color.z());
@@ -213,7 +211,6 @@ class World extends HittableList {
                 i += 4;
             }
         }
-        console.log(imgData);
         return imgData;
     }
 }
@@ -374,15 +371,6 @@ function map255(val) {
 
 function dot(u, v) {
     return u.x() * v.x() + u.y() * v.y() + u.z() * v.z();
-}
-
-function writeToImageData(imgData, x, y, color, a = 255) {
-    console.log(color.x());
-    let i = imgData.length - (y * 4 + x) * 4;
-    imgData[i + 0] = map255(color.x());
-    imgData[i + 1] = map255(color.y());
-    imgData[i + 2] = map255(color.z());
-    imgData[i + 3] = a;
 }
 
 function unitVector(v) {
