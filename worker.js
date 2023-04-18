@@ -201,7 +201,6 @@ class World extends HittableList {
         const totalPixels = w * h;
         const initialValue = [0, 0, 0, 1];
         const imgData = Array(totalPixels).fill(initialValue).flat();
-        imgData[0] = 0.4;
 
         let i = 0;
 
