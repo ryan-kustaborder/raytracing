@@ -1,5 +1,5 @@
 self.onmessage = function (msg) {
-    const world = new HittableList();
+    const world = new World();
     let material_ground = new LambertianMaterial();
     let material_center = new LambertianMaterial();
     let material_left = new ReflectiveLambertianMaterial();
@@ -14,52 +14,8 @@ self.onmessage = function (msg) {
 
     const cam = msg.data.camera;
     const img = msg.data.image;
-    const x0 = 0;
-    const y0 = 0;
-    const sectionWidth = 100;
-    const sectionHeight = 100;
 
-    // Define these as consts for slightly faster read times
-    const imgWidth = img.imgWidth;
-    const imgHeight = img.imgHeight;
-    const maxDepth = img.maxDepth;
-    const samplesPerPixel = img.samplesPerPixel;
-
-    const totalPixels = sectionWidth * sectionHeight;
-    const initialValue = [0, 0, 0, 1];
-    const imgData = Array(totalPixels).fill(initialValue).flat();
-    console.log(imgData.length);
-
-    for (let y = y0; y < sectionHeight; y++) {
-        //console.log("Scanning row " + y);
-        for (let x = 0; x < sectionWidth; x++) {
-            let pixelColor = new Point3D(0, 0.5, 0);
-
-            // Cast samplesPerPixel rays for each pixel
-            for (let s = 0; s < img.samplesPerPixel; s++) {
-                let u = (x + Math.random()) / (imgWidth - 1);
-                let v = (y + Math.random()) / (imgHeight - 1);
-
-                let r = getRayFromCamera(u, v, cam);
-
-                // Cast the ray
-                let colorFromRay = rayColor(r, world, maxDepth);
-
-                // Add to cumulative color for this pixel
-                pixelColor = pixelColor.addVector(colorFromRay);
-            }
-
-            // Write the final pixel to the image
-            writeToImageData(
-                imgData,
-                x,
-                y,
-                averageColor(pixelColor, samplesPerPixel)
-            );
-        }
-    }
-
-    self.postMessage(imgData);
+    self.postMessage(world.renderSection(0, 0, 400, 225, cam, img));
 };
 
 // Gets the given ray from the camera origin that goes through the given screen pixel
@@ -207,6 +163,58 @@ class HittableList extends Hittable {
         }
 
         return { hit: hitAnything, record: rec };
+    }
+}
+
+class World extends HittableList {
+    constructor() {
+        super();
+    }
+
+    renderSection(x0, y0, w, h, cam, img) {
+        // Define these as consts for slightly faster read times
+        const imgWidth = img.imgWidth;
+        const imgHeight = img.imgHeight;
+
+        const maxDepth = img.maxDepth;
+        const samplesPerPixel = img.samplesPerPixel;
+
+        const totalPixels = w * h;
+        const initialValue = [0, 0, 0, 1];
+        const imgData = Array(totalPixels).fill(initialValue).flat();
+        imgData[0] = 0.4;
+
+        let i = 0;
+
+        for (let y = y0; y < h; y++) {
+            //console.log("Scanning row " + y);
+            for (let x = x0; x < w; x++) {
+                let pixelColor = new Point3D(0, 0.5, 0);
+                // Cast samplesPerPixel rays for each pixel
+                for (let s = 0; s < img.samplesPerPixel; s++) {
+                    let u = (x + Math.random()) / (imgWidth - 1);
+                    let v = (y + Math.random()) / (imgHeight - 1);
+                    let r = getRayFromCamera(u, v, cam);
+                    // Cast the ray
+                    let colorFromRay = rayColor(r, this, maxDepth);
+                    // Add to cumulative color for this pixel
+                    pixelColor = pixelColor.addVector(colorFromRay);
+                }
+                // Write the final pixel to the image
+                //console.log(pixelColor.x());
+
+                let color = averageColor(pixelColor, samplesPerPixel);
+                console.log(i);
+                imgData[i + 0] = map255(color.x());
+                imgData[i + 1] = map255(color.y());
+                imgData[i + 2] = map255(color.z());
+                imgData[i + 3] = 255;
+
+                i += 4;
+            }
+        }
+        console.log(imgData);
+        return imgData;
     }
 }
 
@@ -369,6 +377,7 @@ function dot(u, v) {
 }
 
 function writeToImageData(imgData, x, y, color, a = 255) {
+    console.log(color.x());
     let i = imgData.length - (y * 4 + x) * 4;
     imgData[i + 0] = map255(color.x());
     imgData[i + 1] = map255(color.y());

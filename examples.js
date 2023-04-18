@@ -59,11 +59,11 @@ function metallicSpheres() {
     config = JSON.parse(JSON.stringify(config));
     test.postMessage(config);
     test.onmessage = function (msg) {
-        const width = 100;
-        const height = 100;
+        const width = 400;
+        const height = 225;
         const imageData = img.ctx.createImageData(width, height);
         const inputArray = msg.data;
-
+        console.log("entering loop", inputArray);
         for (let i = 0; i < inputArray.length; i += 4) {
             const r = inputArray[i];
             const g = inputArray[i + 1];
@@ -75,14 +75,13 @@ function metallicSpheres() {
             imageData.data[pixelIndex * 4 + 1] = g;
             imageData.data[pixelIndex * 4 + 2] = b;
             imageData.data[pixelIndex * 4 + 3] = a;
-
-            img.ctx.putImageData(imageData, 0, 0);
         }
+        console.log("posting");
+        console.log(imageData);
+        img.ctx.putImageData(imageData, 0, 0);
     };
 
     //let imgData = wor.render(camera, img);
-
-    img.ctx.putImageData(imgData, 0, 0);
 }
 
 function manySpheresWorld() {

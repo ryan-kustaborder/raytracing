@@ -49,12 +49,6 @@ export default class World extends HittableList {
     }
 
     render(cam, img) {
-        let test = new Worker("./workers/worker.js");
-        test.postMessage("beep");
-        test.onmessage = function (msg) {
-            console.log(msg.data);
-        };
-
         return this.renderSection(0, 0, 100, 100, cam, img);
     }
 }
