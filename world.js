@@ -8,17 +8,17 @@ export default class World extends HittableList {
         super();
     }
 
-    render(cam, img) {
+    renderSection(x0, y0, w, h, cam, img) {
+        // Define these as consts for slightly faster read times
         const imgWidth = img.imgWidth;
         const imgHeight = img.imgHeight;
+        const myImageData = img.ctx.createImageData(imgWidth, imgHeight);
         const maxDepth = img.maxDepth;
         const samplesPerPixel = img.samplesPerPixel;
 
-        const myImageData = img.ctx.createImageData(imgWidth, imgHeight);
-
-        for (let y = img.imgHeight - 1; y >= 0; y--) {
+        for (let y = y0; y < h; y++) {
             //console.log("Scanning row " + y);
-            for (let x = img.imgWidth; x >= 0; x--) {
+            for (let x = 0; x < w; x++) {
                 let pixelColor = new Point3D(0, 0.5, 0);
 
                 // Cast samplesPerPixel rays for each pixel
@@ -46,5 +46,15 @@ export default class World extends HittableList {
         }
 
         return myImageData;
+    }
+
+    render(cam, img) {
+        let test = new Worker("./workers/worker.js");
+        test.postMessage("beep");
+        test.onmessage = function (msg) {
+            console.log(msg.data);
+        };
+
+        return this.renderSection(0, 0, 100, 100, cam, img);
     }
 }
