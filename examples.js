@@ -51,16 +51,20 @@ function metallicSpheres() {
     wor.add(new Sphere(new Point3D(1.0, 0.0, -1.0), 0.5, material_right));
 
     // Set up worker
+    const width = 200;
+    const height = 225;
+    const x0 = 50;
+    const y0 = 0;
+
     let worker = new Worker("./workers/worker.js");
     let config = {
         world: wor,
         camera: camera,
         image: img,
+        bounds: { x0: x0, y0: y0, width: width, height: height },
     };
 
     worker.onmessage = function (msg) {
-        const width = 400;
-        const height = 225;
         const imageData = img.ctx.createImageData(width, height);
         const inputArray = msg.data;
 
@@ -76,9 +80,9 @@ function metallicSpheres() {
             imageData.data[i + 2] = b;
             imageData.data[i + 3] = a;
         }
-
+        console.log(imageData);
         // Draw the image to the canvas
-        img.ctx.putImageData(imageData, 0, 0);
+        img.ctx.putImageData(imageData, x0, y0);
     };
 
     // Actually start the worker

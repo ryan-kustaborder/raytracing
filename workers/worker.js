@@ -3,7 +3,9 @@ self.onmessage = function (msg) {
     let material_ground = new LambertianMaterial();
     let material_center = new LambertianMaterial();
     let material_left = new ReflectiveLambertianMaterial();
+    material_left.materialColor = new Point3D(1, 0, 0);
     let material_right = new ReflectiveLambertianMaterial();
+    material_right.materialColor = new Point3D(0, 0, 1);
 
     world.add(
         new Sphere(new Point3D(0.0, -100.5, -1.0), 100.0, material_ground)
@@ -14,8 +16,18 @@ self.onmessage = function (msg) {
 
     const cam = msg.data.camera;
     const img = msg.data.image;
+    const bounds = msg.data.bounds;
 
-    self.postMessage(world.renderSection(0, 0, 400, 225, cam, img));
+    self.postMessage(
+        world.renderSection(
+            bounds.x0,
+            bounds.y0,
+            bounds.width,
+            bounds.height,
+            cam,
+            img
+        )
+    );
 };
 
 // Gets the given ray from the camera origin that goes through the given screen pixel
@@ -186,8 +198,8 @@ class World extends HittableList {
 
         let i = 0;
 
-        for (let y = h; y > x0; y--) {
-            for (let x = w; x > y0; x--) {
+        for (let y = y0 + h; y > y0; y--) {
+            for (let x = x0; x < x0 + w; x++) {
                 let pixelColor = new Point3D(0, 0.5, 0);
                 // Cast samplesPerPixel rays for each pixel
                 for (let s = 0; s < img.samplesPerPixel; s++) {
