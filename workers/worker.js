@@ -1,18 +1,25 @@
 self.onmessage = function (msg) {
+    // Generate world from config
     const world = new World();
-    let material_ground = new LambertianMaterial();
-    let material_center = new LambertianMaterial();
-    let material_left = new ReflectiveLambertianMaterial();
-    material_left.materialColor = new Point3D(1, 0, 0);
-    let material_right = new ReflectiveLambertianMaterial();
-    material_right.materialColor = new Point3D(0, 0, 1);
 
-    world.add(
-        new Sphere(new Point3D(0.0, 100.5, -1.0), 100.0, material_ground)
-    );
-    world.add(new Sphere(new Point3D(0.0, 0.0, -1.0), 0.5, material_center));
-    world.add(new Sphere(new Point3D(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add(new Sphere(new Point3D(1.0, 0.0, -1.0), 0.5, material_right));
+    for (let element of msg.data.world) {
+        let location = new Point3D(element.x, element.y, element.z);
+
+        let mat;
+        let m = element.material;
+        if (m.type == "lambertian") {
+            mat = new LambertianMaterial();
+
+            mat.materialColor = new Point3D(m.color.r, m.color.g, m.color.b);
+        } else if (m.type == "reflective_lambertian") {
+            mat = new ReflectiveLambertianMaterial();
+
+            mat.materialColor = new Point3D(m.color.r, m.color.g, m.color.b);
+            mat.roughness = m.roughness;
+        }
+
+        world.add(new Sphere(location, element.radius, mat));
+    }
 
     const cam = msg.data.camera;
     const img = msg.data.image;

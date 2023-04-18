@@ -53,8 +53,6 @@ function createWorker(config) {
 
         // Draw the image to the canvas
         ctx.putImageData(imageData, config.bounds.x0, config.bounds.y0);
-
-        console.log("Worker Finished");
     };
 
     return worker;
@@ -83,13 +81,62 @@ function metallicSpheres() {
     wor.add(new Sphere(new Point3D(-1.0, 0.0, -1.0), 0.5, material_left));
     wor.add(new Sphere(new Point3D(1.0, 0.0, -1.0), 0.5, material_right));
 
-    const sectionSize = 100;
-    console.log(img);
+    const sectionSize = 50;
+
     for (let x = 0; x * sectionSize < img.imgWidth; x++) {
         for (let y = 0; y * sectionSize < img.imgHeight; y++) {
             // Set up worker
             let config = {
-                world: wor,
+                world: [
+                    {
+                        type: "sphere",
+                        x: 0,
+                        y: 0,
+                        z: -1,
+                        radius: 0.5,
+                        material: {
+                            type: "reflective_lambertian",
+                            color: { r: 1, g: 1, b: 0 },
+                            roughness: 0.02,
+                        },
+                    },
+                    {
+                        type: "sphere",
+                        x: -1,
+                        y: 0,
+                        z: -1,
+                        radius: 0.5,
+                        material: {
+                            type: "reflective_lambertian",
+                            color: { r: 1, g: 0, b: 0 },
+                            roughness: 0.3,
+                        },
+                    },
+                    {
+                        type: "sphere",
+                        x: 1,
+                        y: 0,
+                        z: -1,
+                        radius: 0.5,
+                        material: {
+                            type: "reflective_lambertian",
+                            color: { r: 0, g: 0, b: 1 },
+                            roughness: 0.1,
+                        },
+                    },
+                    {
+                        type: "sphere",
+                        x: 1,
+                        y: 100.5,
+                        z: -1,
+                        radius: 100,
+                        material: {
+                            type: "lambertian",
+                            color: { r: 0.6, g: 0.9, b: 0.4 },
+                            roughness: 0.1,
+                        },
+                    },
+                ],
                 camera: camera,
                 image: img,
                 bounds: {
