@@ -27,6 +27,8 @@ function createWorker(config) {
 
         // Draw the image to the canvas
         ctx.putImageData(imageData, config.bounds.x0, config.bounds.y0);
+
+        console.log("Worker Finished");
     };
 
     return worker;
@@ -34,7 +36,7 @@ function createWorker(config) {
 
 function runExample(worldConfig) {
     // Camera
-    const camera = new Camera();
+    const camera = new Camera(90, 16 / 9);
 
     // Canvas
     let canvas = document.getElementById("canvas");
@@ -42,7 +44,7 @@ function runExample(worldConfig) {
     // Image
     const img = new Image(canvas);
 
-    const sectionSize = 100;
+    const sectionSize = 50;
 
     for (let x = 0; x * sectionSize < img.imgWidth; x++) {
         for (let y = 0; y * sectionSize < img.imgHeight; y++) {
@@ -108,13 +110,42 @@ const reflectiveSpheres = [
     {
         type: "sphere",
         x: 1,
-        y: 100.5,
+        y: -100.5,
         z: -1,
         radius: 100,
         material: {
             type: "lambertian",
             color: { r: 0.6, g: 0.9, b: 0.4 },
             roughness: 0.1,
+        },
+    },
+];
+
+const cameraDemo_r = Math.cos(Math.PI / 4);
+
+const cameraDemo = [
+    {
+        type: "sphere",
+        x: -cameraDemo_r,
+        y: 0,
+        z: -1,
+        radius: cameraDemo_r,
+        material: {
+            type: "reflective_lambertian",
+            color: { r: 1, g: 1, b: 0 },
+            roughness: 0.02,
+        },
+    },
+    {
+        type: "sphere",
+        x: cameraDemo_r,
+        y: 0,
+        z: -1,
+        radius: cameraDemo_r,
+        material: {
+            type: "lambertian",
+            color: { r: 1, g: 0, b: 0 },
+            roughness: 0.3,
         },
     },
 ];

@@ -2,10 +2,14 @@ import Ray from "./Ray.js";
 import Point3D from "./Point3D.js";
 
 export default class Camera {
-    constructor() {
-        this.aspectRatio = 16.0 / 9.0;
-        this.viewportHeight = 2.0;
-        this.viewportWidth = this.aspectRatio * this.viewportHeight;
+    constructor(vfov, aspectRatio) {
+        this.aspectRatio = aspectRatio;
+
+        this.theta = (this.vfov / 360) * (Math.PI * 2);
+        this.h = Math.tan(this.theta / 2);
+        this.viewport_height = 2.0 * this.h;
+        this.viewport_width = this.aspectRatio * this.viewport_height;
+
         this.focalLength = 1;
 
         this.origin = new Point3D(0, 0, 0);

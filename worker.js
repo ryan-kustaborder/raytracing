@@ -21,7 +21,13 @@ self.onmessage = function (msg) {
         world.add(new Sphere(location, element.radius, mat));
     }
 
-    const cam = msg.data.camera;
+    const cam = new Camera(
+        new Point3D(-2, 2, 1),
+        new Point3D(0, 0, -1),
+        new Point3D(0, 1, 0),
+        20,
+        16.0 / 9.0
+    );
     const img = msg.data.image;
     const bounds = msg.data.bounds;
 
@@ -35,23 +41,9 @@ self.onmessage = function (msg) {
             img
         )
     );
+
+    self.close();
 };
-
-// Gets the given ray from the camera origin that goes through the given screen pixel
-function getRayFromCamera(u, v, cam) {
-    let origin = new Point3D(...cam.origin.vector);
-    let lowerLeftCorner = new Point3D(...cam.lowerLeftCorner.vector);
-    let scaledHorizontal = new Point3D(...cam.horizontal.vector).scale(u);
-    let scaledVertical = new Point3D(...cam.vertical.vector).scale(v);
-
-    return new Ray(
-        origin,
-        lowerLeftCorner
-            .addVector(scaledHorizontal)
-            .addVector(scaledVertical)
-            .subtractVector(origin)
-    );
-}
 
 class Point3D {
     constructor(a, b, c) {
@@ -211,7 +203,7 @@ class World extends HittableList {
                 for (let s = 0; s < img.samplesPerPixel; s++) {
                     let u = (x + Math.random()) / (imgWidth - 1);
                     let v = (y + Math.random()) / (imgHeight - 1);
-                    let r = getRayFromCamera(u, v, cam);
+                    let r = cam.getRay(u, v);
                     // Cast the ray
                     let colorFromRay = rayColor(r, this, maxDepth);
                     // Add to cumulative color for this pixel
@@ -279,28 +271,36 @@ class Sphere extends Hittable {
 
 // Represents the camera
 class Camera {
-    constructor() {
-        this.aspectRatio = 16.0 / 9.0;
-        this.viewportHeight = 2.0;
+    constructor(lookFrom, lookAt, vup, theta, aspectRatio) {
+        this.aspectRatio = aspectRatio;
+
+        this.theta = theta * (Math.PI / 180);
+        this.h = Math.tan(this.theta / 2);
+        this.viewportHeight = 2.0 * this.h;
         this.viewportWidth = this.aspectRatio * this.viewportHeight;
+
         this.focalLength = 1;
 
-        this.origin = new Point3D(0, 0, 0);
-        this.horizontal = new Point3D(this.viewportWidth, 0, 0);
-        this.vertical = new Point3D(0, this.viewportHeight, 0);
-        this.lowerLeftCorner = this.origin
+        let w = unitVector(lookFrom.subtractVector(lookAt));
+        let u = unitVector(cross(vup, w));
+        let v = cross(w, u);
+
+        this.origin = lookFrom;
+        this.horizontal = u.scale(this.viewportWidth);
+        this.vertical = v.scale(this.viewportHeight);
+        this.lower_left_corner = this.origin
             .subtractVector(this.horizontal.scale(0.5))
             .subtractVector(this.vertical.scale(0.5))
-            .subtractVector(new Point3D(0, 0, this.focalLength));
+            .subtractVector(w);
     }
 
     // Gets the given ray from the camera origin that goes through the given screen pixel
-    getRay(u, v) {
+    getRay(s, t) {
         return new Ray(
             this.origin,
-            this.lowerLeftCorner
-                .addVector(this.horizontal.scale(u))
-                .addVector(this.vertical.scale(v))
+            this.lower_left_corner
+                .addVector(this.horizontal.scale(s))
+                .addVector(this.vertical.scale(t))
                 .subtractVector(this.origin)
         );
     }
@@ -389,6 +389,14 @@ function map255(val) {
 
 function dot(u, v) {
     return u.x() * v.x() + u.y() * v.y() + u.z() * v.z();
+}
+
+function cross(u, v) {
+    return new Point3D(
+        u.y() * v.z() - u.z() * v.y(),
+        u.z() * v.x() - u.x() * v.z(),
+        u.x() * v.y() - u.y() * v.x()
+    );
 }
 
 function unitVector(v) {
