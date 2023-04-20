@@ -21,11 +21,11 @@ self.onmessage = function (msg) {
         world.add(new Sphere(location, element.radius, mat));
     }
 
-    let lookfrom = new Point3D(3, 3, 2);
-    let lookat = new Point3D(0, 0, -1);
+    let lookfrom = new Point3D(13, 3, 2);
+    let lookat = new Point3D(0, 0, 0);
     let vup = new Point3D(0, 1, 0);
-    let dist_to_focus = lookfrom.subtractVector(lookat).length() - 0.5;
-    let aperture = 2.0;
+    let dist_to_focus = 10;
+    let aperture = 0.1;
 
     const cam = new Camera(
         lookfrom,

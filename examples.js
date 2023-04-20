@@ -1,5 +1,6 @@
 import Camera from "./camera.js";
 import Image from "./Image.js";
+import Point3D from "./Point3D.js";
 
 function createWorker(config) {
     let worker = new Worker("./worker.js");
@@ -27,8 +28,6 @@ function createWorker(config) {
 
         // Draw the image to the canvas
         ctx.putImageData(imageData, config.bounds.x0, config.bounds.y0);
-
-        console.log("Worker Finished");
     };
 
     return worker;
@@ -44,7 +43,7 @@ function runExample(worldConfig) {
     // Image
     const img = new Image(canvas);
 
-    const sectionSize = 50;
+    const sectionSize = 100;
 
     for (let x = 0; x * sectionSize < img.imgWidth; x++) {
         for (let y = 0; y * sectionSize < img.imgHeight; y++) {
@@ -150,4 +149,106 @@ const cameraDemo = [
     },
 ];
 
-runExample(reflectiveSpheres);
+function generateStressTest() {
+    const stressTestBase = [
+        {
+            type: "sphere",
+            x: 0,
+            y: -1000,
+            z: -1,
+            radius: 1000,
+            material: { type: "lambertian", color: { r: 0.5, g: 0.5, b: 0.5 } },
+        },
+        {
+            type: "sphere",
+            x: 0,
+            y: 1,
+            z: 0,
+            radius: 1,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 0.7, g: 0.5, b: 0.7 },
+                roughness: 0.01,
+            },
+        },
+        {
+            type: "sphere",
+            x: 4,
+            y: 1,
+            z: 0,
+            radius: 1,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 0.7, g: 0.6, b: 0.5 },
+                roughness: 0.01,
+            },
+        },
+        {
+            type: "sphere",
+            x: -4,
+            y: 1,
+            z: 0,
+            radius: 1,
+            material: {
+                type: "lambertian",
+                color: { r: 0.4, g: 0.2, b: 0.1 },
+                roughness: 0.01,
+            },
+        },
+    ];
+
+    // Add balls of random color
+    for (let a = -7; a < 7; a++) {
+        for (let b = -7; b < 7; b++) {
+            let choose_mat = Math.random();
+            let center = new Point3D(
+                a + 0.9 * Math.random(),
+                0.2,
+                b + 0.9 * Math.random()
+            );
+
+            if (center.subtractVector(new Point3D(4, 0.2, 0)).length() > 0.9) {
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    stressTestBase.push({
+                        type: "sphere",
+                        x: center.x(),
+                        y: center.y(),
+                        z: center.z(),
+                        radius: 0.2,
+                        material: {
+                            type: "lambertian",
+                            color: {
+                                r: Math.random(),
+                                g: Math.random(),
+                                b: Math.random(),
+                            },
+                        },
+                    });
+                } else {
+                    // metal
+                    stressTestBase.push({
+                        type: "sphere",
+                        x: center.x(),
+                        y: center.y(),
+                        z: center.z(),
+                        radius: 0.2,
+                        material: {
+                            type: "reflective_lambertian",
+                            color: {
+                                r: Math.random(),
+                                g: Math.random(),
+                                b: Math.random(),
+                            },
+                            roughness: Math.random() / 3,
+                        },
+                    });
+                }
+            }
+        }
+    }
+
+    return stressTestBase;
+}
+
+runExample(generateStressTest());
