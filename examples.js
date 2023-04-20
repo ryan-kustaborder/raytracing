@@ -27,7 +27,11 @@ function createWorker(config) {
         }
 
         // Draw the image to the canvas
-        ctx.putImageData(imageData, config.bounds.x0, config.bounds.y0);
+        ctx.putImageData(
+            imageData,
+            config.bounds.x0,
+            config.image.imgHeight - config.bounds.y0 - 30
+        );
     };
 
     return worker;

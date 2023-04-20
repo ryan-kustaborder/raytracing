@@ -200,7 +200,7 @@ class World extends HittableList {
 
         let i = 0;
 
-        for (let y = y0; y < y0 + h; y++) {
+        for (let y = y0 + h; y > y0; y--) {
             for (let x = x0; x < x0 + w; x++) {
                 let pixelColor = new Point3D(0, 0.5, 0);
                 // Cast samplesPerPixel rays for each pixel
