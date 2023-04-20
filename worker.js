@@ -21,20 +21,16 @@ self.onmessage = function (msg) {
         world.add(new Sphere(location, element.radius, mat));
     }
 
-    let lookfrom = new Point3D(13, 3, 2);
-    let lookat = new Point3D(0, 0, 0);
-    let vup = new Point3D(0, 1, 0);
-    let dist_to_focus = 10;
-    let aperture = 0.1;
+    let c = msg.data.camera;
 
     const cam = new Camera(
-        lookfrom,
-        lookat,
-        vup,
+        new Point3D(c.lookfrom.x, c.lookfrom.y, c.lookfrom.z),
+        new Point3D(c.lookat.x, c.lookat.y, c.lookat.z),
+        new Point3D(c.vup.x, c.vup.y, c.vup.z),
         20,
         16.0 / 9.0,
-        aperture,
-        dist_to_focus
+        c.aperture,
+        c.dist_to_focus
     );
     const img = msg.data.image;
     const bounds = msg.data.bounds;

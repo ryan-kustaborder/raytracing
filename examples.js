@@ -33,10 +33,7 @@ function createWorker(config) {
     return worker;
 }
 
-function runExample(worldConfig) {
-    // Camera
-    const camera = new Camera(90, 16 / 9);
-
+function runExample(worldConfig, cameraConfig) {
     // Canvas
     let canvas = document.getElementById("canvas");
 
@@ -51,7 +48,7 @@ function runExample(worldConfig) {
 
             let config = {
                 world: worldConfig,
-                camera: camera,
+                camera: cameraConfig,
                 image: img,
                 bounds: {
                     x0: sectionSize * x,
@@ -69,87 +66,72 @@ function runExample(worldConfig) {
     }
 }
 
-const reflectiveSpheres = [
-    {
-        type: "sphere",
-        x: 0,
-        y: 0,
-        z: -1,
-        radius: 0.5,
-        material: {
-            type: "reflective_lambertian",
-            color: { r: 1, g: 1, b: 0 },
-            roughness: 0.02,
+function runReflectiveSpheres() {
+    const reflectiveSpheres = [
+        {
+            type: "sphere",
+            x: 0,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 1, g: 1, b: 0 },
+                roughness: 0.02,
+            },
         },
-    },
-    {
-        type: "sphere",
-        x: -1,
-        y: 0,
-        z: -1,
-        radius: 0.5,
-        material: {
-            type: "reflective_lambertian",
-            color: { r: 1, g: 0, b: 0 },
-            roughness: 0.3,
+        {
+            type: "sphere",
+            x: -1,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 1, g: 0, b: 0 },
+                roughness: 0.3,
+            },
         },
-    },
-    {
-        type: "sphere",
-        x: 1,
-        y: 0,
-        z: -1,
-        radius: 0.5,
-        material: {
-            type: "reflective_lambertian",
-            color: { r: 0, g: 0, b: 1 },
-            roughness: 0.1,
+        {
+            type: "sphere",
+            x: 1,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 0, g: 0, b: 1 },
+                roughness: 0.1,
+            },
         },
-    },
-    {
-        type: "sphere",
-        x: 1,
-        y: -100.5,
-        z: -1,
-        radius: 100,
-        material: {
-            type: "lambertian",
-            color: { r: 0.6, g: 0.9, b: 0.4 },
-            roughness: 0.1,
+        {
+            type: "sphere",
+            x: 1,
+            y: -100.5,
+            z: -1,
+            radius: 100,
+            material: {
+                type: "lambertian",
+                color: { r: 0.6, g: 0.9, b: 0.4 },
+                roughness: 0.1,
+            },
         },
-    },
-];
+    ];
 
-const cameraDemo_r = Math.cos(Math.PI / 4);
+    const cameraConfig = {
+        lookfrom: { x: 3, y: 3, z: 2 },
+        lookat: { x: 0, y: 0, z: -1 },
+        vup: { x: 0, y: 1, z: 0 },
+        theta: 90,
+        aspectRatio: 16 / 9,
+        dist_to_focus: 10,
+        aperture: 0.1,
+    };
 
-const cameraDemo = [
-    {
-        type: "sphere",
-        x: -cameraDemo_r,
-        y: 0,
-        z: -1,
-        radius: cameraDemo_r,
-        material: {
-            type: "reflective_lambertian",
-            color: { r: 1, g: 1, b: 0 },
-            roughness: 0.02,
-        },
-    },
-    {
-        type: "sphere",
-        x: cameraDemo_r,
-        y: 0,
-        z: -1,
-        radius: cameraDemo_r,
-        material: {
-            type: "lambertian",
-            color: { r: 1, g: 0, b: 0 },
-            roughness: 0.3,
-        },
-    },
-];
+    runExample(reflectiveSpheres, cameraConfig);
+}
 
-function generateStressTest() {
+function runStressTest() {
     const stressTestBase = [
         {
             type: "sphere",
@@ -248,7 +230,18 @@ function generateStressTest() {
         }
     }
 
-    return stressTestBase;
+    const cameraConfig = {
+        lookfrom: { x: 13, y: 3, z: 2 },
+        lookat: { x: 0, y: 0, z: 0 },
+        vup: { x: 0, y: 1, z: 0 },
+        theta: 20,
+        aspectRatio: 16 / 9,
+        dist_to_focus: 0.5,
+        aperture: 0.1,
+    };
+
+    runExample(stressTestBase, cameraConfig);
 }
 
-runExample(generateStressTest());
+//runStressTest();
+runReflectiveSpheres();
