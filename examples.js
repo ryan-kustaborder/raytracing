@@ -66,7 +66,7 @@ function runExample(worldConfig, cameraConfig) {
     }
 }
 
-function runReflectiveSpheres() {
+export function runReflectiveSpheres(theta = 90, focalLength = 5) {
     const reflectiveSpheres = [
         {
             type: "sphere",
@@ -122,9 +122,9 @@ function runReflectiveSpheres() {
         lookfrom: { x: 3, y: 3, z: 2 },
         lookat: { x: 0, y: 0, z: -1 },
         vup: { x: 0, y: 1, z: 0 },
-        theta: 90,
+        theta: theta,
         aspectRatio: 16 / 9,
-        dist_to_focus: 10,
+        dist_to_focus: focalLength,
         aperture: 0.1,
     };
 
@@ -244,4 +244,4 @@ function runStressTest() {
 }
 
 //runStressTest();
-runReflectiveSpheres();
+//runReflectiveSpheres();

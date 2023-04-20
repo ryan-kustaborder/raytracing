@@ -27,8 +27,8 @@ self.onmessage = function (msg) {
         new Point3D(c.lookfrom.x, c.lookfrom.y, c.lookfrom.z),
         new Point3D(c.lookat.x, c.lookat.y, c.lookat.z),
         new Point3D(c.vup.x, c.vup.y, c.vup.z),
-        20,
-        16.0 / 9.0,
+        c.theta,
+        c.aspectRatio,
         c.aperture,
         c.dist_to_focus
     );

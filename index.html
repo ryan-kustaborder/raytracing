@@ -4,10 +4,53 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
+
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            canvas,
+            button {
+                margin: 20px;
+            }
+        </style>
+        <script type="module">
+            import { runReflectiveSpheres } from "./examples.js";
+            window.runReflectiveSpheres = runReflectiveSpheres;
+        </script>
     </head>
     <body>
         <canvas id="canvas" width="400px" height="225px"></canvas>
+        <button
+            onclick="runReflectiveSpheres(document.getElementById('fovAngle').value, document.getElementById('focalLength').value)"
+        >
+            Run
+        </button>
 
-        <script src="./examples.js" type="module"></script>
+        <label for="fovAngle">FOV Angle:</label>
+        <input
+            type="range"
+            min="20"
+            max="160"
+            value="90"
+            class="slider"
+            id="fovAngle"
+            step="5"
+        />
+        <label for="focalLength">Focal Length:</label>
+        <input
+            type="range"
+            min="0"
+            max="5"
+            value="1"
+            class="slider"
+            id="focalLength"
+            step=".05"
+        />
     </body>
 </html>
