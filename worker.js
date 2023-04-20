@@ -21,12 +21,20 @@ self.onmessage = function (msg) {
         world.add(new Sphere(location, element.radius, mat));
     }
 
+    let lookfrom = new Point3D(3, 3, 2);
+    let lookat = new Point3D(0, 0, -1);
+    let vup = new Point3D(0, 1, 0);
+    let dist_to_focus = lookfrom.subtractVector(lookat).length() - 0.5;
+    let aperture = 2.0;
+
     const cam = new Camera(
-        new Point3D(-2, 2, 1),
-        new Point3D(0, 0, -1),
-        new Point3D(0, 1, 0),
+        lookfrom,
+        lookat,
+        vup,
         20,
-        16.0 / 9.0
+        16.0 / 9.0,
+        aperture,
+        dist_to_focus
     );
     const img = msg.data.image;
     const bounds = msg.data.bounds;
@@ -271,7 +279,15 @@ class Sphere extends Hittable {
 
 // Represents the camera
 class Camera {
-    constructor(lookFrom, lookAt, vup, theta, aspectRatio) {
+    constructor(
+        lookFrom,
+        lookAt,
+        vup,
+        theta,
+        aspectRatio,
+        aperture,
+        focusDist
+    ) {
         this.aspectRatio = aspectRatio;
 
         this.theta = theta * (Math.PI / 180);
@@ -281,27 +297,33 @@ class Camera {
 
         this.focalLength = 1;
 
-        let w = unitVector(lookFrom.subtractVector(lookAt));
-        let u = unitVector(cross(vup, w));
-        let v = cross(w, u);
+        this.w = unitVector(lookFrom.subtractVector(lookAt));
+        this.u = unitVector(cross(vup, this.w));
+        this.v = cross(this.w, this.u);
 
         this.origin = lookFrom;
-        this.horizontal = u.scale(this.viewportWidth);
-        this.vertical = v.scale(this.viewportHeight);
+        this.horizontal = this.u.scale(this.viewportWidth).scale(focusDist);
+        this.vertical = this.v.scale(this.viewportHeight).scale(focusDist);
         this.lower_left_corner = this.origin
             .subtractVector(this.horizontal.scale(0.5))
             .subtractVector(this.vertical.scale(0.5))
-            .subtractVector(w);
+            .subtractVector(this.w.scale(focusDist));
+
+        this.lensRadius = aperture / 2;
     }
 
     // Gets the given ray from the camera origin that goes through the given screen pixel
     getRay(s, t) {
+        let rd = randomInUnitDisk().scale(this.lensRadius);
+        let offset = this.u.scale(rd.x()).addVector(this.v.scale(rd.y()));
+
         return new Ray(
-            this.origin,
+            this.origin.addVector(offset),
             this.lower_left_corner
                 .addVector(this.horizontal.scale(s))
                 .addVector(this.vertical.scale(t))
                 .subtractVector(this.origin)
+                .subtractVector(offset)
         );
     }
 }
@@ -433,6 +455,14 @@ function randomDirectionInUnitSphere() {
 
 function randomUnitVector() {
     return unitVector(randomDirectionInUnitSphere());
+}
+
+function randomInUnitDisk() {
+    while (true) {
+        let p = new Point3D(Math.random() * 2 - 1, Math.random() * 2 - 1, 0);
+        if (p.lengthSquared() >= 1) continue;
+        return p;
+    }
 }
 
 function isNearZero(v) {
