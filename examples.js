@@ -30,8 +30,10 @@ function createWorker(config) {
         ctx.putImageData(
             imageData,
             config.bounds.x0,
-            config.image.imgHeight - config.bounds.y0 - 30
+            config.image.imgHeight - config.bounds.y0 - 50
         );
+
+        console.log("Worker finished at " + Math.round(Date.now() / 1000));
     };
 
     return worker;
@@ -135,7 +137,133 @@ export function runReflectiveSpheres(theta = 90, focalLength = 5) {
     runExample(reflectiveSpheres, cameraConfig);
 }
 
-function runStressTest() {
+export function runPropertyDemo() {
+    const reflectiveSpheres = [
+        {
+            type: "sphere",
+            x: 0,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 0.7, g: 0.7, b: 0.7 },
+                roughness: 0.1,
+            },
+        },
+        {
+            type: "sphere",
+            x: -1,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "lambertian",
+                color: { r: 1, g: 0, b: 0 },
+                roughness: 0.3,
+            },
+        },
+        {
+            type: "sphere",
+            x: 1,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "lambertian",
+                color: { r: 0, g: 0, b: 1 },
+                roughness: 0.1,
+            },
+        },
+        {
+            type: "sphere",
+            x: 1,
+            y: -100.5,
+            z: -1,
+            radius: 100,
+            material: {
+                type: "lambertian",
+                color: { r: 0.6, g: 0.9, b: 0.4 },
+                roughness: 0.1,
+            },
+        },
+    ];
+
+    const focalLength = new Point3D(3, 3, 2)
+        .subtractVector(new Point3D(0, 0, -1))
+        .length();
+
+    const cameraConfig = {
+        lookfrom: { x: 3, y: 3, z: 2 },
+        lookat: { x: 0, y: 0, z: -1 },
+        vup: { x: 0, y: 1, z: 0 },
+        theta: 20,
+        aspectRatio: 16 / 9,
+        dist_to_focus: focalLength,
+        aperture: 1,
+    };
+
+    runExample(reflectiveSpheres, cameraConfig);
+}
+
+export function runBounceDemo() {
+    const reflectiveSpheres = [
+        {
+            type: "sphere",
+            x: 0,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 0.7, g: 0.7, b: 0.7 },
+                roughness: 0,
+            },
+        },
+        {
+            type: "sphere",
+            x: -1,
+            y: 0,
+            z: -1,
+            radius: 0.5,
+            material: {
+                type: "reflective_lambertian",
+                color: { r: 1, g: 0, b: 0 },
+                roughness: 0,
+            },
+        },
+        {
+            type: "sphere",
+            x: 1,
+            y: -100.5,
+            z: -1,
+            radius: 100,
+            material: {
+                type: "lambertian",
+                color: { r: 0.6, g: 0.9, b: 0.4 },
+                roughness: 0.1,
+            },
+        },
+    ];
+
+    const focalLength = new Point3D(0, 0, 1)
+        .subtractVector(new Point3D(-0.5, 0, -1))
+        .length();
+
+    const cameraConfig = {
+        lookfrom: { x: 0, y: 0, z: 1 },
+        lookat: { x: -0.5, y: 0, z: -1 },
+        vup: { x: 0, y: 1, z: 0 },
+        theta: 20,
+        aspectRatio: 16 / 9,
+        dist_to_focus: focalLength,
+        aperture: 0.1,
+    };
+
+    runExample(reflectiveSpheres, cameraConfig);
+}
+
+export function runStressTest() {
     const stressTestBase = [
         {
             type: "sphere",
@@ -235,17 +363,15 @@ function runStressTest() {
     }
 
     const cameraConfig = {
-        lookfrom: { x: 13, y: 3, z: 2 },
+        lookfrom: { x: 13, y: 2, z: 3 },
         lookat: { x: 0, y: 0, z: 0 },
         vup: { x: 0, y: 1, z: 0 },
         theta: 20,
         aspectRatio: 16 / 9,
-        dist_to_focus: 0.5,
+        dist_to_focus: 10,
         aperture: 0.1,
     };
 
+    console.log(Math.round(Date.now() / 1000));
     runExample(stressTestBase, cameraConfig);
 }
-
-//runStressTest();
-//runReflectiveSpheres();

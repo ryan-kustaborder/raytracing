@@ -335,10 +335,6 @@ class LambertianMaterial {
                 Math.random()
             );
         }
-
-        // These currently do nothing, but are placeholders for future light implementation
-        this.emissionColor = new Point3D(0.2, 0.5, 0);
-        this.emissionStrength = Math.random();
     }
 
     // Gets the light that is added from interacting with the material
